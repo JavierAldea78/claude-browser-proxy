@@ -1,0 +1,16 @@
+{
+  "name": "Claude Browser",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "Claude (browser)",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postStartCommand": "bash ${containerWorkspaceFolder}/start.sh &",
+  "remoteUser": "vscode"
+}
