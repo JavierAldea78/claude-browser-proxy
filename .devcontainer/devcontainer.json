@@ -1,8 +1,12 @@
 {
   "name": "Claude Browser",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "version": "latest",
+      "noVncPort": 6080,
+      "password": "claude"
+    }
   },
   "forwardPorts": [6080],
   "portsAttributes": {
@@ -11,6 +15,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postStartCommand": "bash ${containerWorkspaceFolder}/start.sh &",
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y chromium",
+  "postStartCommand": "sleep 8 && DISPLAY=:1 chromium --no-sandbox --disable-gpu --disable-dev-shm-usage 'https://claude.ai' &",
   "remoteUser": "vscode"
 }
