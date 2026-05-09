@@ -1,6 +1,6 @@
 {
   "name": "Claude Browser",
-  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "version": "latest",
@@ -15,7 +15,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y chromium",
-  "postStartCommand": "sleep 15 && DISPLAY=:1 chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --start-maximized 'https://claude.ai' &",
+  "onCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends chromium-browser fonts-liberation libappindicator3-1",
+  "postStartCommand": "bash .devcontainer/start-claude.sh",
   "remoteUser": "vscode"
 }
