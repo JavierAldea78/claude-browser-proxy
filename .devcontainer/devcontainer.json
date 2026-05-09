@@ -1,12 +1,13 @@
 {
   "name": "Claude Browser",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "version": "latest",
       "noVncPort": 6080,
       "password": "claude"
-    }
+    },
+    "ghcr.io/devcontainers/features/sshd:1": {}
   },
   "forwardPorts": [6080],
   "portsAttributes": {
@@ -15,7 +16,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "onCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends chromium-browser fonts-liberation libappindicator3-1",
+  "onCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends chromium fonts-liberation",
   "postStartCommand": "bash .devcontainer/start-claude.sh",
   "remoteUser": "vscode"
 }

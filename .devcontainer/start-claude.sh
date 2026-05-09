@@ -12,7 +12,7 @@ for i in $(seq 1 30); do
 done
 
 echo "[claude-browser] Launching Chromium → https://claude.ai"
-DISPLAY=:1 chromium-browser \
+DISPLAY=:1 chromium \
   --no-sandbox \
   --disable-setuid-sandbox \
   --disable-dev-shm-usage \
