@@ -26,14 +26,11 @@ nginx -c /etc/nginx/nginx.conf
 
 # --- Display virtual ---
 echo "[claude] Iniciando Xvfb..."
-Xvfb "$DISPLAY_ID" -screen 0 1920x1080x24 -ac +extension RANDR +extension GLX +render -noreset &
+Xvfb "$DISPLAY_ID" -screen 0 1280x800x24 -ac +extension RANDR +extension GLX +render -noreset &
 for i in $(seq 1 15); do
     DISPLAY=$DISPLAY_ID xdpyinfo >/dev/null 2>&1 && break
     sleep 1
 done
-
-# --- Gestor de ventanas (necesario para que resizeSession maximice Chromium) ---
-DISPLAY=$DISPLAY_ID openbox --sm-disable &
 
 # --- VNC server ---
 echo "[claude] Iniciando x11vnc..."
@@ -41,7 +38,6 @@ x11vnc \
     -display "$DISPLAY_ID" \
     -forever -nopw -shared \
     -noxrecord -noxfixes -noxdamage \
-    -xrandr \
     -localhost \
     2>/tmp/x11vnc.log &
 
@@ -67,7 +63,8 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-dev-shm-usage \
             --disable-gpu \
             --disable-namespace-sandbox \
-            --start-maximized \
+            --window-size=1280,800 \
+            --window-position=0,0 \
             --app=https://claude.ai \
             --no-first-run \
             --disable-infobars \

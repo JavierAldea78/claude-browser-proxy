@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-color-emoji \
     openssl \
     procps \
-    openbox \
     && rm -rf /var/lib/apt/lists/*
 
 # noVNC moderno v1.4.0 (el paquete Debian es demasiado antiguo para resize)

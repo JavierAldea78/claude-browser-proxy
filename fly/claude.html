@@ -19,17 +19,12 @@
               + '://' + location.host + '/websockify';
 
     const rfb = new RFB(document.getElementById('screen'), url);
-    rfb.resizeSession = true;
-    rfb.scaleViewport = false;
+    rfb.scaleViewport = true;
+    rfb.resizeSession = false;
     rfb.background = '#000';
 
-    rfb.addEventListener('connect', () => {
-      document.title = 'Claude';
-    });
-
-    rfb.addEventListener('disconnect', () => {
-      setTimeout(() => location.reload(), 3000);
-    });
+    rfb.addEventListener('connect', () => { document.title = 'Claude'; });
+    rfb.addEventListener('disconnect', () => { setTimeout(() => location.reload(), 3000); });
   </script>
 </body>
 </html>
