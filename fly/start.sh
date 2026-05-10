@@ -16,15 +16,15 @@ ACCESS_PASS="${ACCESS_PASS:-$(openssl rand -base64 16 | tr -d '/+=')}"
 htpasswd -cb /run/claude/.htpasswd claude "$ACCESS_PASS"
 echo "[claude] *** CONTRASENA DE ACCESO: $ACCESS_PASS ***"
 
-# --- Directorios ---
+# --- Directorios y permisos (volumen Railway monta como root) ---
 mkdir -p "$CHROME_PROFILE"
-chown -R claude:claude /home/claude
+chmod -R 777 "$CHROME_PROFILE"
 
 # --- Nginx con puerto dinamico ---
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 nginx -c /etc/nginx/nginx.conf
 
-# --- Display virtual con soporte RANDR para resize dinamico ---
+# --- Display virtual ---
 echo "[claude] Iniciando Xvfb..."
 Xvfb "$DISPLAY_ID" -screen 0 1920x1080x24 -ac +extension RANDR +extension GLX +render -noreset &
 for i in $(seq 1 15); do
@@ -32,17 +32,16 @@ for i in $(seq 1 15); do
     sleep 1
 done
 
-# --- VNC server con soporte de resize dinamico ---
+# --- VNC server ---
 echo "[claude] Iniciando x11vnc..."
 x11vnc \
     -display "$DISPLAY_ID" \
     -forever -nopw -shared \
     -noxrecord -noxfixes -noxdamage \
-    -xrandr resize \
     -localhost \
     2>/tmp/x11vnc.log &
 
-# --- noVNC moderno (WebSocket bridge) ---
+# --- noVNC (WebSocket bridge) ---
 echo "[claude] Iniciando noVNC..."
 websockify \
     --web "$NOVNC_DIR" \
@@ -52,11 +51,11 @@ websockify \
 
 sleep 2
 
-# --- Chromium con watchdog ---
+# --- Chromium como root (evita problemas de permisos con volumen Railway) ---
 echo "[claude] Lanzando Chromium -> claude.ai"
 (
     while true; do
-        su claude -c "DISPLAY=$DISPLAY_ID chromium \
+        DISPLAY=$DISPLAY_ID chromium \
             --no-sandbox \
             --disable-dev-shm-usage \
             --disable-gpu \
@@ -67,8 +66,8 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-translate \
             --disable-features=TranslateUI,PasswordLeakDetection \
             --renderer-process-limit=1 \
-            --user-data-dir=$CHROME_PROFILE \
-            2>/tmp/chromium.log"
+            --user-data-dir="$CHROME_PROFILE" \
+            2>&1 | head -5
         echo "[claude] Chromium cerrado. Reiniciando en 3s..."
         sleep 3
     done
