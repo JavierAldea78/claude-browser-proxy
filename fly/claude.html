@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+    #screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    #screen canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="screen"></div>
+  <script type="module">
+    import RFB from '/core/rfb.js';
+
+    const host = location.hostname;
+    const port = location.port;
+    const path = 'websockify';
+    const url  = (location.protocol === 'https:' ? 'wss' : 'ws')
+               + '://' + host + (port ? ':' + port : '') + '/' + path;
+
+    const rfb = new RFB(document.getElementById('screen'), url);
+    rfb.scaleViewport = true;   // escala para llenar el div
+    rfb.resizeSession = true;   // pide al servidor que ajuste resolucion
+    rfb.background   = '#000';
+
+    rfb.addEventListener('connect', () => {
+      document.title = 'Claude';
+    });
+
+    rfb.addEventListener('disconnect', (e) => {
+      // Reconectar automaticamente tras 3s
+      setTimeout(() => location.reload(), 3000);
+    });
+
+    // Ajustar cuando cambia el tamanio de la ventana
+    window.addEventListener('resize', () => {
+      rfb.scaleViewport = false;
+      rfb.scaleViewport = true;
+    });
+  </script>
+</body>
+</html>

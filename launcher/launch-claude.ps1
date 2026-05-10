@@ -2,7 +2,7 @@
 # Ejecutar: powershell -ExecutionPolicy Bypass -File launch-claude.ps1
 
 $password  = "Q2CjSkjHZFDr0LLeaXzpg"
-$url       = "https://claude:$password@claude-browser-production.up.railway.app/vnc.html?autoconnect=true&resize=remote"
+$url       = "https://claude:$password@claude-browser-production.up.railway.app/claude.html"
 
 $edge   = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"

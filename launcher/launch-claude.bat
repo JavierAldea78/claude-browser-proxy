@@ -1,7 +1,7 @@
 @echo off
 :: Lanzador Claude — abre Claude en modo app (sin barra de navegador)
 
-set APP_URL=https://claude:Q2CjSkjHZFDr0LLeaXzpg@claude-browser-production.up.railway.app/vnc.html?autoconnect=true^&resize=remote
+set APP_URL=https://claude:Q2CjSkjHZFDr0LLeaXzpg@claude-browser-production.up.railway.app/claude.html
 
 :: Intenta Edge (siempre disponible en Windows corporativo)
 set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"

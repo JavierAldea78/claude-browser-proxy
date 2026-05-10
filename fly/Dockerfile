@@ -26,6 +26,7 @@ RUN useradd -m -s /bin/bash claude
 
 COPY start.sh /start.sh
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY claude.html /opt/novnc/claude.html
 RUN chmod +x /start.sh \
     && rm -f /etc/nginx/sites-enabled/*
 
