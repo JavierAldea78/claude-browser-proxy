@@ -6,6 +6,7 @@ DISPLAY_ID=":1"
 VNC_PORT=5900
 NOVNC_PORT=6080
 CHROME_PROFILE="/home/claude/.config/chromium-claude"
+NOVNC_DIR="/opt/novnc"
 
 echo "[claude] Iniciando..."
 
@@ -14,7 +15,6 @@ mkdir -p /run/claude
 ACCESS_PASS="${ACCESS_PASS:-$(openssl rand -base64 16 | tr -d '/+=')}"
 htpasswd -cb /run/claude/.htpasswd claude "$ACCESS_PASS"
 echo "[claude] *** CONTRASENA DE ACCESO: $ACCESS_PASS ***"
-echo "[claude] *** URL: https://TU_DOMINIO/vnc.html?autoconnect=true&resize=scale ***"
 
 # --- Directorios ---
 mkdir -p "$CHROME_PROFILE"
@@ -24,27 +24,28 @@ chown -R claude:claude /home/claude
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 nginx -c /etc/nginx/nginx.conf
 
-# --- Display virtual ---
+# --- Display virtual con soporte RANDR para resize dinamico ---
 echo "[claude] Iniciando Xvfb..."
-Xvfb "$DISPLAY_ID" -screen 0 1280x800x24 -ac +extension GLX +render -noreset &
+Xvfb "$DISPLAY_ID" -screen 0 1920x1080x24 -ac +extension RANDR +extension GLX +render -noreset &
 for i in $(seq 1 15); do
     DISPLAY=$DISPLAY_ID xdpyinfo >/dev/null 2>&1 && break
     sleep 1
 done
 
-# --- VNC server (solo localhost) ---
+# --- VNC server con soporte de resize dinamico ---
 echo "[claude] Iniciando x11vnc..."
 x11vnc \
     -display "$DISPLAY_ID" \
     -forever -nopw -shared \
     -noxrecord -noxfixes -noxdamage \
+    -xrandr resize \
     -localhost \
     2>/tmp/x11vnc.log &
 
-# --- noVNC (WebSocket bridge) ---
+# --- noVNC moderno (WebSocket bridge) ---
 echo "[claude] Iniciando noVNC..."
 websockify \
-    --web /usr/share/novnc \
+    --web "$NOVNC_DIR" \
     --heartbeat 30 \
     "$NOVNC_PORT" "127.0.0.1:$VNC_PORT" \
     2>/tmp/websockify.log &
@@ -74,5 +75,4 @@ echo "[claude] Lanzando Chromium -> claude.ai"
 ) &
 
 echo "[claude] Listo."
-# Mantener el contenedor vivo
 wait
