@@ -39,7 +39,7 @@ x11vnc \
     -forever -nopw -shared \
     -noxrecord -noxfixes -noxdamage \
     -localhost \
-    2>/var/log/x11vnc.log &
+    2>/tmp/x11vnc.log &
 
 # --- noVNC (WebSocket bridge) ---
 echo "[claude] Iniciando noVNC..."
@@ -47,7 +47,7 @@ websockify \
     --web /usr/share/novnc \
     --heartbeat 30 \
     "$NOVNC_PORT" "127.0.0.1:$VNC_PORT" \
-    2>/var/log/websockify.log &
+    2>/tmp/websockify.log &
 
 sleep 2
 
@@ -68,7 +68,7 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-features=TranslateUI,PasswordLeakDetection \
             --renderer-process-limit=1 \
             --user-data-dir=$CHROME_PROFILE \
-            2>/var/log/chromium.log"
+            2>/tmp/chromium.log"
         echo "[claude] Chromium cerrado. Reiniciando en 3s..."
         sleep 3
     done

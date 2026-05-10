@@ -4,6 +4,12 @@ http {
     server {
         listen ${PORT};
 
+        location /health {
+            auth_basic off;
+            return 200 "ok\n";
+            add_header Content-Type text/plain;
+        }
+
         location / {
             auth_basic "Claude";
             auth_basic_user_file /run/claude/.htpasswd;
