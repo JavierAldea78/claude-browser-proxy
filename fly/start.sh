@@ -51,6 +51,9 @@ websockify \
 
 sleep 2
 
+# --- Limpiar locks del perfil de sesiones anteriores ---
+rm -f "$CHROME_PROFILE/SingletonLock" "$CHROME_PROFILE/SingletonCookie" "$CHROME_PROFILE/SingletonSocket"
+
 # --- Chromium como root (evita problemas de permisos con volumen Railway) ---
 echo "[claude] Lanzando Chromium -> claude.ai"
 (
