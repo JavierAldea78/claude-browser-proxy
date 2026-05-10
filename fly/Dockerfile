@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     novnc \
     nginx \
     apache2-utils \
+    gettext-base \
     chromium \
     fonts-liberation \
     fonts-noto-color-emoji \
@@ -17,10 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -m -s /bin/bash claude
 
 COPY start.sh /start.sh
-COPY nginx.conf /etc/nginx/sites-available/default
-RUN rm -f /etc/nginx/sites-enabled/default \
-    && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
-    && chmod +x /start.sh
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+RUN chmod +x /start.sh \
+    && rm -f /etc/nginx/sites-enabled/*
 
 EXPOSE 8080
 

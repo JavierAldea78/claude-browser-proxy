@@ -1,62 +1,58 @@
 #!/usr/bin/env bash
-# Entrypoint del contenedor cloud — arranca todo y mantiene el proceso vivo.
+# Entrypoint del contenedor — funciona en Railway y Fly.io
 
-set -e
-
+PORT="${PORT:-8080}"
 DISPLAY_ID=":1"
-RESOLUTION="${RESOLUTION:-1280x800x24}"
 VNC_PORT=5900
 NOVNC_PORT=6080
-DATA_DIR="${DATA_DIR:-/data}"
-CHROME_PROFILE="$DATA_DIR/chromium-profile"
+CHROME_PROFILE="/home/claude/.config/chromium-claude"
 
-echo "[claude] Configurando autenticacion..."
+echo "[claude] Iniciando..."
+
+# --- Auth ---
 mkdir -p /run/claude
 ACCESS_PASS="${ACCESS_PASS:-$(openssl rand -base64 16 | tr -d '/+=')}"
 htpasswd -cb /run/claude/.htpasswd claude "$ACCESS_PASS"
-echo "[claude] Contrasena de acceso: $ACCESS_PASS"
-echo "[claude] URL: https://$(hostname).fly.dev/vnc.html?autoconnect=true&resize=scale"
+echo "[claude] *** CONTRASENA DE ACCESO: $ACCESS_PASS ***"
+echo "[claude] *** URL: https://TU_DOMINIO/vnc.html?autoconnect=true&resize=scale ***"
 
-echo "[claude] Creando directorio de datos en $DATA_DIR..."
+# --- Directorios ---
 mkdir -p "$CHROME_PROFILE"
-chown -R claude:claude "$DATA_DIR" 2>/dev/null || true
+chown -R claude:claude /home/claude
 
-echo "[claude] Iniciando display virtual $DISPLAY_ID ($RESOLUTION)..."
-Xvfb "$DISPLAY_ID" -screen 0 "$RESOLUTION" -ac +extension GLX +render -noreset &
-XVFB_PID=$!
+# --- Nginx con puerto dinamico ---
+envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+nginx -c /etc/nginx/nginx.conf
 
-# Esperar display
-for i in $(seq 1 20); do
+# --- Display virtual ---
+echo "[claude] Iniciando Xvfb..."
+Xvfb "$DISPLAY_ID" -screen 0 1280x800x24 -ac +extension GLX +render -noreset &
+for i in $(seq 1 15); do
     DISPLAY=$DISPLAY_ID xdpyinfo >/dev/null 2>&1 && break
     sleep 1
 done
 
-echo "[claude] Iniciando servidor VNC..."
+# --- VNC server (solo localhost) ---
+echo "[claude] Iniciando x11vnc..."
 x11vnc \
     -display "$DISPLAY_ID" \
-    -forever \
-    -nopw \
-    -shared \
-    -noxrecord \
-    -noxfixes \
-    -noxdamage \
+    -forever -nopw -shared \
+    -noxrecord -noxfixes -noxdamage \
     -localhost \
     2>/var/log/x11vnc.log &
 
-echo "[claude] Iniciando noVNC (websockify)..."
+# --- noVNC (WebSocket bridge) ---
+echo "[claude] Iniciando noVNC..."
 websockify \
     --web /usr/share/novnc \
     --heartbeat 30 \
-    --timeout 86400 \
-    "$NOVNC_PORT" \
-    "127.0.0.1:$VNC_PORT" \
+    "$NOVNC_PORT" "127.0.0.1:$VNC_PORT" \
     2>/var/log/websockify.log &
 
-echo "[claude] Iniciando nginx (proxy con auth)..."
-nginx
+sleep 2
 
+# --- Chromium con watchdog ---
 echo "[claude] Lanzando Chromium -> claude.ai"
-# Watchdog: reinicia Chromium si se cae
 (
     while true; do
         su claude -c "DISPLAY=$DISPLAY_ID chromium \
@@ -70,6 +66,7 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-infobars \
             --disable-translate \
             --disable-features=TranslateUI,PasswordLeakDetection \
+            --renderer-process-limit=1 \
             --user-data-dir=$CHROME_PROFILE \
             2>/var/log/chromium.log"
         echo "[claude] Chromium cerrado. Reiniciando en 3s..."
@@ -77,5 +74,6 @@ echo "[claude] Lanzando Chromium -> claude.ai"
     done
 ) &
 
-echo "[claude] Todo arrancado. Esperando..."
-wait $XVFB_PID
+echo "[claude] Listo."
+# Mantener el contenedor vivo
+wait

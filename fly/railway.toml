@@ -1,0 +1,12 @@
+[build]
+  dockerfilePath = "Dockerfile"
+
+[deploy]
+  restartPolicyType = "always"
+  restartPolicyMaxRetries = 10
+
+[environments.production.variables]
+  PORT = "8080"
+  RESOLUTION = "1280x800x24"
+  # ACCESS_PASS se configura en Railway Dashboard -> Variables
+  # (nunca hardcodear la contrasena aqui)
