@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     apache2-utils \
     gettext-base \
-    git \
+    curl \
+    ca-certificates \
     chromium \
     fonts-liberation \
     fonts-noto-color-emoji \
@@ -15,8 +16,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-# noVNC moderno desde GitHub (el paquete Debian es demasiado antiguo)
-RUN git clone --depth 1 https://github.com/novnc/noVNC.git /opt/novnc \
+# noVNC moderno v1.4.0 (el paquete Debian es demasiado antiguo para resize)
+RUN curl -sL https://github.com/novnc/noVNC/archive/refs/tags/v1.4.0.tar.gz \
+    | tar -xz -C /opt \
+    && mv /opt/noVNC-1.4.0 /opt/novnc \
     && ln -s /opt/novnc/vnc.html /opt/novnc/index.html
 
 RUN useradd -m -s /bin/bash claude
