@@ -1,9 +1,8 @@
 # Lanzador Claude — alternativa PowerShell al .bat
 # Ejecutar: powershell -ExecutionPolicy Bypass -File launch-claude.ps1
 
-$password  = "CAMBIA_ESTA_CONTRASENA"
-$appName   = "claude-browser-javier"
-$url       = "https://claude:$password@$appName.fly.dev/vnc.html?autoconnect=true&resize=scale"
+$password  = "Q2CjSkjHZFDr0LLeaXzpg"
+$url       = "https://claude:$password@claude-browser-production.up.railway.app/vnc.html?autoconnect=true&resize=scale"
 
 $edge   = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
