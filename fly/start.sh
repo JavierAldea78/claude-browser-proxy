@@ -57,7 +57,6 @@ echo "[claude] Lanzando Chromium -> claude.ai"
     while true; do
         su claude -c "DISPLAY=$DISPLAY_ID chromium \
             --no-sandbox \
-            --disable-setuid-sandbox \
             --disable-dev-shm-usage \
             --disable-gpu \
             --start-maximized \
