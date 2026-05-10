@@ -67,7 +67,7 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-features=TranslateUI,PasswordLeakDetection \
             --renderer-process-limit=1 \
             --user-data-dir="$CHROME_PROFILE" \
-            2>&1 | head -5
+            >/tmp/chromium.log 2>&1
         echo "[claude] Chromium cerrado. Reiniciando en 3s..."
         sleep 3
     done
