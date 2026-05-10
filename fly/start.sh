@@ -59,6 +59,7 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --no-sandbox \
             --disable-dev-shm-usage \
             --disable-gpu \
+            --disable-namespace-sandbox \
             --start-maximized \
             --app=https://claude.ai \
             --no-first-run \
@@ -68,7 +69,10 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --renderer-process-limit=1 \
             --user-data-dir="$CHROME_PROFILE" \
             >/tmp/chromium.log 2>&1
-        echo "[claude] Chromium cerrado. Reiniciando en 3s..."
+        EXIT_CODE=$?
+        echo "[claude] Chromium cerrado (exit $EXIT_CODE). Reiniciando en 3s..."
+        echo "[claude] --- chromium.log ---"
+        tail -20 /tmp/chromium.log | while IFS= read -r line; do echo "[chromium] $line"; done
         sleep 3
     done
 ) &
