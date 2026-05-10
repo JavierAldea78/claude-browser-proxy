@@ -63,7 +63,8 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-dev-shm-usage \
             --disable-gpu \
             --disable-namespace-sandbox \
-            --start-maximized \
+            --window-size=1920,1080 \
+            --window-position=0,0 \
             --app=https://claude.ai \
             --no-first-run \
             --disable-infobars \

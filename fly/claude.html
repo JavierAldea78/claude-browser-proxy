@@ -7,8 +7,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-    #screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    #screen canvas { display: block; }
+    #screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
@@ -16,30 +15,20 @@
   <script type="module">
     import RFB from '/core/rfb.js';
 
-    const host = location.hostname;
-    const port = location.port;
-    const path = 'websockify';
-    const url  = (location.protocol === 'https:' ? 'wss' : 'ws')
-               + '://' + host + (port ? ':' + port : '') + '/' + path;
+    const url = (location.protocol === 'https:' ? 'wss' : 'ws')
+              + '://' + location.host + '/websockify';
 
     const rfb = new RFB(document.getElementById('screen'), url);
-    rfb.scaleViewport = true;   // escala para llenar el div
-    rfb.resizeSession = true;   // pide al servidor que ajuste resolucion
-    rfb.background   = '#000';
+    rfb.scaleViewport = true;
+    rfb.resizeSession = false;
+    rfb.background = '#000';
 
     rfb.addEventListener('connect', () => {
       document.title = 'Claude';
     });
 
-    rfb.addEventListener('disconnect', (e) => {
-      // Reconectar automaticamente tras 3s
+    rfb.addEventListener('disconnect', () => {
       setTimeout(() => location.reload(), 3000);
-    });
-
-    // Ajustar cuando cambia el tamanio de la ventana
-    window.addEventListener('resize', () => {
-      rfb.scaleViewport = false;
-      rfb.scaleViewport = true;
     });
   </script>
 </body>
