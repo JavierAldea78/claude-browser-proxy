@@ -32,12 +32,16 @@ for i in $(seq 1 15); do
     sleep 1
 done
 
+# --- Gestor de ventanas (necesario para que resizeSession maximice Chromium) ---
+DISPLAY=$DISPLAY_ID openbox --sm-disable &
+
 # --- VNC server ---
 echo "[claude] Iniciando x11vnc..."
 x11vnc \
     -display "$DISPLAY_ID" \
     -forever -nopw -shared \
     -noxrecord -noxfixes -noxdamage \
+    -xrandr \
     -localhost \
     2>/tmp/x11vnc.log &
 
@@ -63,8 +67,7 @@ echo "[claude] Lanzando Chromium -> claude.ai"
             --disable-dev-shm-usage \
             --disable-gpu \
             --disable-namespace-sandbox \
-            --window-size=1920,1080 \
-            --window-position=0,0 \
+            --start-maximized \
             --app=https://claude.ai \
             --no-first-run \
             --disable-infobars \

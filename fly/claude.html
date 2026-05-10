@@ -19,8 +19,8 @@
               + '://' + location.host + '/websockify';
 
     const rfb = new RFB(document.getElementById('screen'), url);
-    rfb.scaleViewport = true;
-    rfb.resizeSession = false;
+    rfb.resizeSession = true;
+    rfb.scaleViewport = false;
     rfb.background = '#000';
 
     rfb.addEventListener('connect', () => {
