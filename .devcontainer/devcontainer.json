@@ -1,13 +1,14 @@
 {
   "name": "Claude Browser",
-  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "version": "latest",
       "noVncPort": 6080,
       "password": "claude"
-    },
-    "ghcr.io/devcontainers/features/sshd:1": {}
+    }
   },
   "forwardPorts": [6080],
   "portsAttributes": {
@@ -16,7 +17,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "onCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends chromium fonts-liberation",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": "bash .devcontainer/start-claude.sh",
   "remoteUser": "vscode"
 }
